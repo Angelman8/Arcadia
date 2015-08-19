@@ -3,7 +3,7 @@
 boolean lightsTriggered = false;
 boolean phoneDetected = true;
 
-boolean useVoice = false;
+boolean useVoice = true;
 boolean useKinect = true;
 boolean useServer = true;
 boolean showControls = true;
@@ -68,12 +68,10 @@ void setup() {
 
   //Test Vocal chords
   minim = new Minim(this);
-  SetAudioSource(5);
+  SetAudioSource(0);
   voice = new Voice(voiceName);
   println("Testing vocal chords...");
   print("SUCCESS!");
-
-  searchGoogle("Who wrote I am Pilgrim?");
 }
 
 void draw() {
@@ -130,10 +128,10 @@ void receive( byte[] data, String ip, int port ) {
 }
 
 void keyPressed() {
-  int random = (int)random(1, 11);
+  int random = (int)random(1, 1);
   switch (random) {
   case 1:
-    voice.Speak("Hello, sir.");
+    voice.Speak("Hello sir, my name is Arcadia.");
     break;
   case 2:
     voice.Speak("Hello there.");

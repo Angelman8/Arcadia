@@ -33,7 +33,7 @@ class Voice {
     if ( ! voice.equals("")) {
       voiceCmd = "-v " + voice + " ";
     }
-    println("Watson says: " + phrase);
+    println("Arcadia says: " + phrase);
     execute("say -a 58 " + voiceCmd + phrase);
   }
 
