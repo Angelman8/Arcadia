@@ -1,167 +1,33 @@
+boolean verbose = true;
 
-//Booleans
-boolean lightsTriggered = false;
-boolean phoneDetected = true;
+Ai arcadia;
 
-boolean useVoice = true;
-boolean useKinect = true;
-boolean useServer = true;
-boolean showControls = true;
-boolean showDepth = false;
-boolean showVoice = true;
+void setup() 
+{
+  size(640, 480);
+  arcadia = new Ai();
+  arcadia.setBody(new BodyWatson(90, 150));
+  arcadia.setEyes(new VisionKinect(this, true));
+}
 
-boolean alarm = true;
-
-int peopleActive = 0;
-
-//HUE LIGHTS
-Light light1, light2;
-boolean light1History, light2History = true;
-String user = "newdeveloper";
-int brightnessScale = 30;
-int transitionSpeed = 2;
-
-String lastAction = "";
-
-//SPEECH
-String voiceName = "Serena";
-Voice voice;
-
-//SPHINX
-Sphinx listener;
-String s = "";
-
-//KINECT
-SimpleOpenNI  context;
-PImage img;
-
-//BLUETOOTH PROXIMITY
-UDP udp;
-String udpBroadcast = "";
-int PORT = 5005;
-
-void setup() {
-  size(300, 300);
+void draw()
+{
   background(0);
+  arcadia.eyes.look();
+  arcadia.body.render();
 
-  //Sphinx
-  if (useVoice) {
-    listener = new Sphinx(this, "upstairs.config.xml");
-  }
-
-  //Hue
-  String bridge_ip = GetBridgeIP();
-  light1 = new Light(bridge_ip, user, 1);
-  light2 = new Light(bridge_ip, user, 2);
-
-  //Kinect
-  context = new SimpleOpenNI(this);
-  context.enableDepth();  
-  context.enableUser();
-  context.setMirror(true);
-  img = createImage(640, 480, RGB);
-  img.loadPixels();
-
-  //Server
-  udp = new UDP( this, PORT );
-  udp.listen( true );
-
-  //Test Vocal chords
-  minim = new Minim(this);
-  SetAudioSource(0);
-  voice = new Voice(voiceName);
-  println("Testing vocal chords...");
-  print("SUCCESS!");
-}
-
-void draw() {
-  background(0);
-
-  if (useKinect) {
-    drawDepth();
-  }
-
-  if (useServer) {
-    if (phoneDetected) {
-      fill(0, 255, 0);
-    } else {
-      fill(255, 0, 0);
+  if (arcadia.eyes.foundUser()) {
+    arcadia.wake();
+    if (arcadia.clock.late()) {
+      arcadia.lights.on(2);
+      arcadia.lights.brightness(2, 30);
+    } else if (arcadia.clock.evening()) {
+      arcadia.lights.on(2);
     }
-    rect(width - 15, 3, 10, 10);
-
-    if (peopleActive > 0) {
-      fill(0, 0, 255);
-    } else {
-      fill(255, 0, 0);
-    }
-    rect(width - 30, 3, 10, 10);
-  }
-
-  if (!lightsTriggered && !phoneDetected && peopleActive <= 0) {
-    light1History = light1.on();
-    light2History = light2.on();
-    light1.on(false);
-    light2.on(false);
-    lightsTriggered = true;
-  } else if (lightsTriggered && (phoneDetected || peopleActive > 0)) {
-    lightsTriggered = false;
-    light1.on(light1History);
-    light2.on(light2History);
-  }
-
-  if (showVoice) {
-    voice.Render();
-  }
-}
-
-void receive( byte[] data, String ip, int port ) {
-  if (useServer) {
-    data = subset(data, 0, data.length-2);
-    String message = new String( data );
-    if (message.equals("Galen.1")) {
-      phoneDetected = true;
-    } else {
-      phoneDetected = false;
-    }
-    //println( "UDP Broadcast: \""+message+"\" from "+ip+" on port "+port );
-  }
-}
-
-void keyPressed() {
-  int random = (int)random(1, 1);
-  switch (random) {
-  case 1:
-    voice.Speak("Hello sir, my name is Arcadia.");
-    break;
-  case 2:
-    voice.Speak("Hello there.");
-    break;
-  case 3:
-    voice.Speak("Hi.");
-    break;
-  case 4:
-    voice.Speak("Greetings sir.");
-    break;
-  case 5:
-    voice.Speak("Well hi, sir.");
-    break;
-  case 6:
-    voice.Speak("Good to see you.");
-    break;
-  case 7:
-    voice.Speak("Sir?");
-    break;
-  case 8:
-    voice.Speak("Good day.");
-    break;
-  case 9:
-    voice.Speak("Charmed.");
-    break;
-  case 10:
-    voice.Speak("Hey there, sir.");
-    break;
-  default:
-    break;
+  } else if (arcadia.eyes.lostAllUsers()) { 
+    arcadia.sleep();
+    arcadia.lights.off(1);
+    arcadia.lights.off(2);
   }
 }
 
