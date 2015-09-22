@@ -6,7 +6,7 @@ void setup()
 {
   size(640, 480);
   arcadia = new Ai();
-  arcadia.setBody(new BodyWatson(90, 150));
+  arcadia.setBody(new BodyWatson(130, 147));
   arcadia.setEyes(new VisionKinect(this, true));
 }
 
@@ -23,11 +23,21 @@ void draw()
       arcadia.lights.brightness(2, 30);
     } else if (arcadia.clock.evening()) {
       arcadia.lights.on(2);
+      arcadia.lights.brightness(2, 98);
     }
   } else if (arcadia.eyes.lostAllUsers()) { 
     arcadia.sleep();
     arcadia.lights.off(1);
     arcadia.lights.off(2);
+  }
+}
+
+void keyPressed()
+{
+  if (arcadia.isAwake()) {
+    arcadia.sleep();
+  } else {
+    arcadia.wake();
   }
 }
 

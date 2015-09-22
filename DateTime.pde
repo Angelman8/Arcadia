@@ -14,12 +14,14 @@ class Clock extends Date
   public boolean late()
   {
     calendar.setTime(new Date());
-    return calendar.get(Calendar.HOUR_OF_DAY) > 22;
+    int hour = calendar.get(Calendar.HOUR_OF_DAY);
+    return hour >= 22 || hour < 7;
   }
   
   public boolean evening()
   {
     calendar.setTime(new Date());
-    return calendar.get(Calendar.HOUR_OF_DAY) > 19;
+    int hour = calendar.get(Calendar.HOUR_OF_DAY);
+    return hour >= 18 || hour < 22;
   }
 }
